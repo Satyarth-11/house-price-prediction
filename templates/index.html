@@ -1,0 +1,136 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>House Price Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-dark">
+
+<div class="container">
+  <div class="row">
+
+```
+<div class="card" style="width:100%; margin-top:50px">
+
+  <div class="card-header text-center">
+    <h1>Welcome to House Prediction Model</h1>
+  </div>
+
+  <div class="card-body">
+
+    <form method="post" accept-charset="utf-8">
+
+      <div class="row">
+
+        <div class="col-md-6 form-group text-center">
+          <label><b>Select the Location :</b></label>
+
+          <select class="form-control" name="location" required>
+
+            {% for location in locations %}
+            <option value="{{location}}">{{location}}</option>
+            {% endfor %}
+
+          </select>
+
+        </div>
+
+
+        <div class="col-md-6 form-group text-center">
+          <label><b>Enter BHK :</b></label>
+
+          <input type="text"
+                 class="form-control"
+                 id="bhk"
+                 name="bhk"
+                 placeholder="Enter BHK"
+                 required>
+
+        </div>
+
+
+        <div class="col-md-6 form-group text-center">
+          <label><b>Enter Number of Bathrooms :</b></label>
+
+          <input type="text"
+                 class="form-control"
+                 id="bath"
+                 name="bath"
+                 placeholder="Enter Number of Bathrooms"
+                 required>
+
+        </div>
+
+
+        <div class="col-md-6 form-group text-center">
+          <label><b>Enter Total Square Feet :</b></label>
+
+          <input type="text"
+                 class="form-control"
+                 id="sqft"
+                 name="total_sqft"
+                 placeholder="Enter Total Square Feet"
+                 required>
+
+        </div>
+
+
+        <div class="col-md-12 form-group mt-3">
+          <button class="btn btn-primary form-control" onclick = "send_data()">
+            Predict Price
+          </button>
+        </div>
+
+      </div>
+
+    </form>
+
+    <br>
+
+    <div class="col-md-12 text-center">
+      <h3><span id="prediction"></span></h3>
+    </div>
+
+  </div>
+
+</div>
+
+
+  </div>
+</div><script>
+function form_handler(event){
+  event.preventDefault();
+}
+function send_data(){
+
+    document.querySelector('form').addEventListener("submit",form_handler);
+
+    var form = document.querySelector('form');
+
+    var fd = new FormData(form);
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.open('POST','/predict',true);
+
+    document.getElementById("prediction").innerHTML="Wait Predicting Price!...";
+
+  
+
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState == XMLHttpRequest.DONE){
+        document.getElementById('prediction').innerHTML="Prediction : ₹"+xhr.responseText;
+      }
+    };
+    xhr.onload = function(){};
+    xhr.send(fd);
+
+}
+
+</script>
+</body>
+</html>
