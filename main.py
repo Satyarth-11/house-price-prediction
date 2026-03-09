@@ -1,28 +1,32 @@
-from flask import Flask, render_template, request
-import pandas as pd
-import numpy as  np
-import pickle 
-data = pd.read_csv('Cleaned_data.csv')
+from flask import Flask, request, render_template
+import numpy as np
+import pickle
 
-# FIX CSV STRUCTURE
-data = data.iloc[:,0].str.split(',', expand=True)
-data.columns = ['index','location','total_sqft','bath','price','bhk']
-pipe =  pickle.load(open("RidgeModel.pkl","rb"))
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    locations = sorted(data['location'].unique())
-    return render_template('index.html', locations=locations)
-@app.route('/predict',methods=['POST'])
+model = pickle.load(open("model.pkl", "rb"))
+
+@app.route("/")
+def home():
+    print("Home page visited")
+    return render_template("index.html")
+
+
+@app.route("/predict", methods=["POST"])
 def predict():
-    location = request.form.get('location')
-    bhk = request.form.get('bhk')
-    bath = request.form.get('bath')
-    sqft = request.form.get('total_sqft')
-    print(location,bhk,bath,sqft)
-    input = pd.DataFrame([[location,sqft,bath,bhk]],columns=['location','total_sqft','bath','bhk'])
-    prediction = pipe.predict(input)[0]*1e5
-    return str(np.round(prediction,2))
-if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    sqft = float(request.form["total_sqft"])
+    bath = int(request.form["bath"])
+    bhk = int(request.form["bhk"])
+
+    print(f"Prediction request → sqft={sqft}, bath={bath}, bhk={bhk}")
+
+    features = np.array([[sqft, bath, bhk]])
+    prediction = model.predict(features)
+
+    print(f"Predicted price = {prediction[0]}")
+
+    return render_template("index.html", prediction=prediction[0])
+
+
+if __name__ == "__main__":
+    app.run()
